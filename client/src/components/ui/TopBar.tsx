@@ -42,9 +42,7 @@ export default function TopBar() {
      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
   
   {/* Label */}
-  <span className="text-xs text-white/60 font-medium tracking-wide">
-    Table
-  </span>
+  
 
   <AnimatePresence>
     {mounted && tableNumber ? (
