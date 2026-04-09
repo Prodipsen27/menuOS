@@ -32,5 +32,16 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
+app.get("/keep-alive", (req, res) => {
+  res.send("Keep Alive");
+});
+
+setInterval(() => {
+  fetch(process.env.BACK_URL)
+  .then(() => console.log("Keep Alive"))
+  .catch((err) => console.log(err));
+}, 1000 * 60 * 14);
+
+
 // Export the server for Vercel
 export default server;
