@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import MenuItemCard from "@/components/menu/MenuItemCard";
 import FeaturedCarousel from "@/components/menu/FeaturedCarousel";
@@ -29,7 +29,7 @@ interface MenuItem {
   isFeatured: boolean;
 }
 
-export default function MenuPage() {
+function MenuContent() {
   const searchParams = useSearchParams();
   const setTableNumber = useCartStore(state => state.setTableNumber);
   
@@ -254,5 +254,22 @@ export default function MenuPage() {
       {/* Persistent Components */}
       <CartPanel />
     </div>
+  );
+}
+
+export default function MenuPage() {
+  return (
+    <Suspense 
+      fallback={
+        <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-6 text-center">
+          <Loader2 className="animate-spin text-primary mb-4" size={32} />
+          <div className="text-[10px] uppercase tracking-[0.4em] text-primary/40 animate-pulse">
+            Resonance...
+          </div>
+        </div>
+      }
+    >
+      <MenuContent />
+    </Suspense>
   );
 }
