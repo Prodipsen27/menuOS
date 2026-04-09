@@ -218,7 +218,7 @@ export function generateOrderReceipt(order: OrderData, restaurantName = "Cafe") 
     <div class="section-label">Guest Details</div>
     <div class="info-row">
       <span class="info-label">Name</span>
-      <span class="info-value">${order.name}</span>
+      <span class="info-value">${order.name || "Guest"}</span>
     </div>
     ${order.phone ? `
     <div class="info-row">

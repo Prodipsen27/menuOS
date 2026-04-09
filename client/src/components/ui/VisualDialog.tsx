@@ -21,8 +21,8 @@ export default function VisualDialog() {
     close();
   };
 
-  const Icon = type === "error" ? AlertCircle : type === "warning" ? AlertTriangle : type === "confirm" ? CheckCircle2 : Info;
-  const iconColor = type === "error" ? "text-red-500" : type === "warning" ? "text-amber-500" : type === "confirm" ? "text-primary" : "text-primary/60";
+  const Icon = type === "error" ? AlertCircle : type === "warning" ? AlertTriangle : type === "success" || type === "confirm" ? CheckCircle2 : Info;
+  const iconColor = type === "error" ? "text-red-500" : type === "warning" ? "text-amber-500" : type === "success" ? "text-green-500" : type === "confirm" ? "text-primary" : "text-primary/60";
   const showCancel = type === "confirm" || type === "warning";
 
   return (

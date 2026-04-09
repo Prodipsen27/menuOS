@@ -11,6 +11,8 @@ export const translations = {
     tagline: "A boutique nocturnal culinary experience. Curated personally for your plate.",
     begin_experience: "Begin Interactive Experience",
     browse_classic: "Browse Classic Menu",
+    chef_signatures: "Chef's Signatures",
+    open_cart: "Open Cart",
     
     // Common UI
     table: "Table",
@@ -74,6 +76,8 @@ export const translations = {
     preparing_selection: "Your culinary experience is being prepared.",
     track_order: "Track Order",
     provide_info: "Please provide your name and contact info.",
+    provide_info_desc: "We need this to track your order and send updates.",
+    email_id: "Email ID",
     error_msg: "Something went wrong. Please try again.",
     
     // Tracking Page
@@ -103,6 +107,7 @@ export const translations = {
     search_placeholder: "Search the menu...",
     total_amount: "Total Amount",
     your_order: "Your Order",
+    in_cart: "In Cart",
 
     // Collection Tags
     tag_botanical: "Botanical Drinks",
@@ -136,6 +141,8 @@ export const translations = {
     tagline: "एक विशेष रात्रिभोज अनुभव। व्यक्तिगत रूप से आपकी थाली के लिए क्यूरेट किया गया।",
     begin_experience: "इंटरैक्टिव अनुभव शुरू करें",
     browse_classic: "क्लासिक मेन्यू देखें",
+    chef_signatures: "शेफ के हस्ताक्षर",
+    open_cart: "झोली खोलें",
     
     // Common UI
     table: "टेबल",
@@ -199,6 +206,8 @@ export const translations = {
     preparing_selection: "आपका भोजन तैयार किया जा रहा है।",
     track_order: "आदेश ट्रैक करें",
     provide_info: "कृपया अपना नाम और संपर्क जानकारी प्रदान करें।",
+    provide_info_desc: "हमें आपके आदेश को ट्रैक करने के लिए इसकी आवश्यकता है।",
+    email_id: "ईमेल आईडी",
     error_msg: "कुछ गलत हो गया। कृपया फिर से प्रयास करें।",
     
     // Tracking Page
@@ -228,6 +237,7 @@ export const translations = {
     search_placeholder: "मेन्यू में खोजें...",
     total_amount: "कुल राशि",
     your_order: "आपका आदेश",
+    in_cart: "झोली में",
 
     // Collection Tags
     tag_botanical: "वानस्पतिक पेय",
@@ -261,6 +271,8 @@ export const translations = {
     tagline: "একটি বিশেষ নৈশভোজ অভিজ্ঞতা। ব্যক্তিগতভাবে আপনার পাতের জন্য কিউরেট করা হয়েছে।",
     begin_experience: "ইন্টার্যাক্টিভ অভিজ্ঞতা শুরু করুন",
     browse_classic: "ক্লাসিক মেনু দেখুন",
+    chef_signatures: "শেফের সিগনেচার",
+    open_cart: "কার্ট খুলুন",
     
     // Common UI
     table: "টেবিল",
@@ -324,6 +336,8 @@ export const translations = {
     preparing_selection: "আপনার রন্ধন অভিজ্ঞতা প্রস্তুত করা হচ্ছে।",
     track_order: "অর্ডার ট্র্যাক করুন",
     provide_info: "আপনার নাম এবং যোগাযোগের তথ্য প্রদান করুন।",
+    provide_info_desc: "আপনার অর্ডার ট্র্যাক করতে আমাদের এটি প্রয়োজন।",
+    email_id: "ইমেল আইডি",
     error_msg: "কিছু ভুল হয়েছে। দয়া করে আবার চেষ্টা করুন।",
     
     // Tracking Page
@@ -353,6 +367,7 @@ export const translations = {
     search_placeholder: "মেনু অনুসন্ধান করুন...",
     total_amount: "মোট পরিমাণ",
     your_order: "আপনার অর্ডার",
+    in_cart: "কার্টে আছে",
 
     // Collection Tags
     tag_botanical: "বোটানিক্যাল পানীয়",

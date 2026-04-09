@@ -87,7 +87,7 @@ export default function ProductDetailPage() {
 
   useLiveMenu(() => fetchItem(false));
 
-  if (loading && !item) {
+  if (loading || !item) {
     return (
       <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center gap-4">
         <motion.div
@@ -354,19 +354,7 @@ export default function ProductDetailPage() {
 
           {/* Cart Shortcut - Only visible if there are items in cart */}
           {cartItems.length > 0 && (
-            <div className="w-16 h-16">
-              <CartPanel>
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white relative group"
-                >
-                  <ShoppingBag size={28} />
-                  <span className="absolute -top-1 -right-1 w-6 h-6 bg-primary text-on-primary text-[10px] font-black rounded-full flex items-center justify-center border-4 border-neutral-900 shadow-xl group-hover:scale-110 transition-transform">
-                    {cartItems.reduce((acc, i) => acc + i.quantity, 0)}
-                  </span>
-                </motion.button>
-              </CartPanel>
-            </div>
+            <CartPanel />
           )}
         </div>
       </div>

@@ -9,7 +9,8 @@ import {
   Utensils,
   History as HistoryIcon,
   Archive,
-  XCircle
+  XCircle,
+  Printer
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
 import { useDialogStore } from "@/features/ui/dialogStore";
+import { generateOrderReceipt } from "@/lib/generateReceipt";
+import { useSettingsStore } from "@/features/settings/settingsStore";
 
 type OrderStatus = "received" | "preparing" | "serving" | "archived" | "canceled";
 
@@ -30,6 +33,8 @@ interface OrderItem {
 interface Order {
   id: string;
   table: string;
+  name: string;
+  phone?: string;
   items: OrderItem[];
   total: number;
   status: OrderStatus;
@@ -45,6 +50,7 @@ export default function OrdersPage() {
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
   const router = useRouter();
   const showDialog = useDialogStore((state) => state.show);
+  const { restaurantName } = useSettingsStore();
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
@@ -289,6 +295,14 @@ export default function OrdersPage() {
                     className="p-2.5 rounded-xl bg-surface-container-high border border-white/5 text-on-surface-variant/40 hover:text-rose-500 transition-all"
                   >
                     <Trash2 size={16} />
+                  </button>
+
+                  <button 
+                    onClick={() => generateOrderReceipt(order, restaurantName)}
+                    className="p-2.5 rounded-xl bg-surface-container-high border border-white/5 text-on-surface-variant/40 hover:text-primary transition-all"
+                    title="Print Receipt"
+                  >
+                    <Printer size={16} />
                   </button>
                 </div>
               </div>
