@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type DialogType = "info" | "confirm" | "error";
+type DialogType = "info" | "confirm" | "error" | "warning";
 
 interface DialogState {
   isOpen: boolean;

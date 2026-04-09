@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useDialogStore } from "@/features/ui/dialogStore";
-import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function VisualDialog() {
@@ -21,8 +21,9 @@ export default function VisualDialog() {
     close();
   };
 
-  const Icon = type === "error" ? AlertCircle : type === "confirm" ? CheckCircle2 : Info;
-  const iconColor = type === "error" ? "text-red-500" : type === "confirm" ? "text-primary" : "text-primary/60";
+  const Icon = type === "error" ? AlertCircle : type === "warning" ? AlertTriangle : type === "confirm" ? CheckCircle2 : Info;
+  const iconColor = type === "error" ? "text-red-500" : type === "warning" ? "text-amber-500" : type === "confirm" ? "text-primary" : "text-primary/60";
+  const showCancel = type === "confirm" || type === "warning";
 
   return (
     <AnimatePresence>
@@ -75,7 +76,7 @@ export default function VisualDialog() {
                   {confirmLabel}
                 </motion.button>
                 
-                {type === "confirm" && (
+                {showCancel && (
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={handleCancel}
