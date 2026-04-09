@@ -24,5 +24,14 @@ app.use("/api/menu", menuRoutes);
 app.get("/", (req, res) => {
   res.send("API running...");
 });
+app.get("/keep-alive", (req, res) => {
+  res.send("Keep Alive");
+});
+
+setInterval(() => {
+  fetch(process.env.BACK_URL)
+  .then(() => console.log("Keep Alive"))
+  .catch((err) => console.log(err));
+}, 1000 * 60 * 15);
 
 export default app;
