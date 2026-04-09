@@ -17,13 +17,15 @@ const manrope = Manrope({
   display: "swap",
 });
 
+export const viewport = "width=device-width, initial-scale=1, viewport-fit=cover";
+
 export const metadata: Metadata = {
   title: "Luxé Digital Menu | The Digital Sommelier",
   description: "A premium, nocturnal culinary experience for the curated soul.",
-  viewport: "width=device-width, initial-scale=1, viewport-fit=cover",
 };
 
 import SettingsManager from "@/components/ui/SettingsManager";
+import VisualDialog from "@/components/ui/VisualDialog";
 
 export default function RootLayout({
   children,
@@ -40,6 +42,7 @@ export default function RootLayout({
           <TopBar />
           {children}
           <BottomNavWrapper />
+          <VisualDialog />
         </SettingsManager>
       </body>
     </html>

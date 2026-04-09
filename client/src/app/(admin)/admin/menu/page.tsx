@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { cn, formatPrice, CURRENCY_SYMBOL } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { API_URL } from "@/lib/apiConfig";
+import { useDialogStore } from "@/features/ui/dialogStore";
 
 
 type Category = "cocktails" | "mains" | "desserts" | "starters";
@@ -47,6 +48,7 @@ export default function AdminMenuPage() {
   const [imageSource, setImageSource] = useState<"url" | "upload">("url");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const showDialog = useDialogStore((state) => state.show);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -176,21 +178,29 @@ export default function AdminMenuPage() {
     }
   };
 
-  const deleteItem = async (id: string, e: React.MouseEvent) => {
+  const deleteItem = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Remove this item from the catalog?")) return;
-    const token = localStorage.getItem("admin_token");
-    try {
-      const res = await fetch(`${API_URL}/menu/${id}`, {
-        method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      if (res.ok) {
-        setItems(prev => prev.filter(item => item.id !== id));
+    showDialog({
+      title: "Confirm Deletion",
+      message: "Remove this item from the catalog? This action cannot be undone.",
+      type: "warning",
+      confirmLabel: "Delete Item",
+      cancelLabel: "Keep Item",
+      onConfirm: async () => {
+        const token = localStorage.getItem("admin_token");
+        try {
+          const res = await fetch(`${API_URL}/menu/${id}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (res.ok) {
+            setItems(prev => prev.filter(item => item.id !== id));
+          }
+        } catch (err) {
+          console.error("Delete failed", err);
+        }
       }
-    } catch (err) {
-      console.error("Delete failed", err);
-    }
+    });
   };
 
   const filteredItems = items.filter(item => {

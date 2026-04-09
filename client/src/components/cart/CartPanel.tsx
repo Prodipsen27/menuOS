@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function CartPanel() {
+  const { t } = useTranslation();
   const { items, getTotal } = useCartStore();
   
   const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
@@ -19,7 +21,7 @@ export default function CartPanel() {
           initial={{ y: 100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
-          className="fixed bottom-[88px] left-0 w-full px-6 z-40 pointer-events-none"
+          className="fixed bottom-[110px] left-0 right-0 w-full max-w-[450px] mx-auto px-6 z-40 pointer-events-none"
         >
           <Link href="/cart" className="pointer-events-auto block">
             <motion.button
@@ -36,10 +38,10 @@ export default function CartPanel() {
                 </div>
                 <div className="flex flex-col items-start leading-tight">
                   <span className="font-headline tracking-tight uppercase text-[10px] opacity-80">
-                    Your Selection
+                    {t('your_selection')}
                   </span>
                   <span className="text-sm font-bold">
-                    {totalCount} {totalCount === 1 ? "Item" : "Items"}
+                    {totalCount} {totalCount === 1 ? t('item') : t('items')}
                   </span>
                 </div>
               </div>

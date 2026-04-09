@@ -1,9 +1,6 @@
 import { Order } from "../models/orderModel.js";
 import { io } from "../index.js";
 import { Settings } from "../models/settingsModel.js";
-import { Notification } from "../models/notificationModel.js";
-
-// ... existing exports ...
 
 export const getSettings = async (req, res) => {
   try {
@@ -157,19 +154,18 @@ export const getAnalyticsData = async (req, res) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    // 3. Category Distribution (Mocking based on top items for now, or fetch all items)
-    // Actually let's assume if an item's name is in the orders, we don't have its category here 
-    // unless we look it up. For now let's use a simpler metric or mock categories.
-    // IMPROVED: Let's assume some common categories for a quick mock or ideally fetch Menu items.
-    // Let's just do Category Distribution based on a pre-defined map for this project
-    const categoryRev = { "Mains": 0, "Cocktails": 0, "Appetizers": 0, "Desserts": 0 };
-    orders.forEach(o => {
-      // Mock logic: randomly distribute revenue to categories if we don't store category in order
-      // (This is just for visual filler if category isn't in Order model)
-      const categories = Object.keys(categoryRev);
-      const cat = categories[Math.floor(Math.random() * categories.length)];
-      categoryRev[cat] += o.total;
+    // 3. Category Distribution
+    const categoryRev = {};
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        const cat = item.category || "Uncategorized";
+        categoryRev[cat] = (categoryRev[cat] || 0) + (item.price * item.quantity);
+      });
     });
+    
+    if (Object.keys(categoryRev).length === 0 && orders.length > 0) {
+      categoryRev["General"] = orders.reduce((acc, o) => acc + o.total, 0);
+    }
 
     const categoryDistribution = Object.entries(categoryRev).map(([name, value]) => ({ name, value }));
 
@@ -182,23 +178,5 @@ export const getAnalyticsData = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch analytics" });
-  }
-};
-
-export const getNotifications = async (req, res) => {
-  try {
-    const notifications = await Notification.find().sort({ createdAt: -1 }).limit(20);
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch notifications" });
-  }
-};
-
-export const markNotificationAsRead = async (req, res) => {
-  try {
-    await Notification.findByIdAndUpdate(req.params.id, { isRead: true });
-    res.json({ message: "Notification marked as read" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update notification" });
   }
 };

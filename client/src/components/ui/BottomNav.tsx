@@ -5,20 +5,23 @@ import { UtensilsCrossed, Search, ScrollText, Sparkles } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
+import { TranslationKey } from "@/lib/translations";
 
-const NAV_ITEMS = [
-  { id: "menu", label: "Menu", icon: UtensilsCrossed, path: "/menu" },
-  { id: "search", label: "Search", icon: Search, path: "/search" },
-  { id: "orders", label: "Orders", icon: ScrollText, path: "/tracking" },
-  { id: "ai", label: "Concierge", icon: Sparkles, path: "/ai" },
+const NAV_ITEMS: { id: string; labelKey: TranslationKey; icon: any; path: string }[] = [
+  { id: "menu", labelKey: "menu", icon: UtensilsCrossed, path: "/menu" },
+  { id: "search", labelKey: "search", icon: Search, path: "/search" },
+  { id: "orders", labelKey: "orders", icon: ScrollText, path: "/tracking" },
+  { id: "ai", labelKey: "concierge", icon: Sparkles, path: "/ai" },
 ];
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 px-4 pb-6 pt-2">
-      <div className="max-w-[400px] mx-auto bg-[#151311]/80 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] flex justify-around items-center p-2 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <nav className="fixed bottom-0 left-0 w-full z-50">
+      <div className="max-w-[450px] mx-auto bg-background/95 border-t border-white/5 flex justify-around items-center px-4 py-3 pb-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.path || (pathname === "/" && item.id === "menu");
           
@@ -47,10 +50,10 @@ export default function BottomNav() {
                 />
                 
                 <span className={cn(
-                  "text-[9px] uppercase tracking-[0.15em] font-bold mt-1.5",
+                  "text-[9px] uppercase tracking-[0.15em] font-bold mt-1.5 min-w-[60px] text-center",
                   isActive ? "opacity-100" : "opacity-60"
                 )}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </span>
                 
                 {isActive && (

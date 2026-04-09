@@ -14,7 +14,6 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
   const isLoginPage = pathname === "/login";
@@ -24,33 +23,6 @@ export default function AdminLayout({
       router.push("/login");
     }
   }, [pathname, isLoginPage, router]);
-
-  const fetchUnread = useCallback(async () => {
-    const token = localStorage.getItem("admin_token");
-    if (!token || isLoginPage) return;
-    try {
-      const res = await fetch(`${API_URL}/admin/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUnreadCount(data.filter((n: { isRead: boolean }) => !n.isRead).length);
-      }
-    } catch { /* silent */ }
-  }, [isLoginPage]);
-
-  useEffect(() => {
-    fetchUnread();
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
-  }, [fetchUnread]);
-
-  // Clear badge when visiting notifications page
-  useEffect(() => {
-    if (pathname === "/admin/notifications") {
-      setUnreadCount(0);
-    }
-  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("admin_token");
@@ -81,28 +53,6 @@ export default function AdminLayout({
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3">
-                {/* Functional Notification Bell */}
-                <button
-                  onClick={() => router.push("/admin/notifications")}
-                  className="relative p-2.5 rounded-xl bg-surface-container-low border border-white/5 text-on-surface-variant hover:text-primary hover:border-primary/20 transition-all"
-                  title="Notifications"
-                >
-                  <Bell size={18} />
-                  <AnimatePresence>
-                    {unreadCount > 0 && (
-                      <motion.span
-                        key="badge"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        exit={{ scale: 0 }}
-                        className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-primary text-on-primary text-[9px] font-bold rounded-full shadow-lg shadow-primary/30 ring-2 ring-background"
-                      >
-                        {unreadCount > 9 ? "9+" : unreadCount}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </button>
-
                 {/* Admin Avatar */}
                 <button className="flex items-center gap-3 p-1.5 pl-3 rounded-xl bg-surface-container-low border border-white/5 hover:border-primary/20 transition-all cursor-pointer">
                   <span className="hidden sm:block text-xs font-bold text-on-surface-variant">Admin</span>

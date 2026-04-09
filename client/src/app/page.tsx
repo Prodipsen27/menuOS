@@ -4,8 +4,13 @@ import { motion } from "framer-motion";
 import { ThreeCanvas } from "@/components/canvas/ThreeCanvas";
 import { HeroModel } from "@/components/canvas/HeroModel";
 import { ChevronRight, Play, UtensilsCrossed } from "lucide-react";
+import { useSettingsStore } from "@/features/settings/settingsStore";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Home() {
+  const { t } = useTranslation();
+  const { restaurantName } = useSettingsStore();
+
   return (
     <main className="relative min-h-screen bg-background flex flex-col items-center justify-center p-6 overflow-hidden">
       {/* 3D Background / Hero Section */}
@@ -13,6 +18,7 @@ export default function Home() {
         <ThreeCanvas camera={{ position: [0, 0, 4], fov: 45 }}>
           <HeroModel />
         </ThreeCanvas>
+        
       </div>
 
       {/* Content Overlay */}
@@ -31,16 +37,16 @@ export default function Home() {
           >
             <UtensilsCrossed className="w-4 h-4 text-primary" />
             <span className="text-[10px] uppercase tracking-[0.2em] text-primary font-bold">
-              The Digital Sommelier
+              {t('digital_sommelier')}
             </span>
           </motion.div>
 
           <h1 className="text-6xl md:text-7xl font-headline italic text-on-surface mb-4 leading-[1.1]">
-            Aura <span className="text-primary">Gilded</span> BK
+            {restaurantName.split(' ')[0]} <span className="text-primary">{restaurantName.split(' ').slice(1).join(' ')}</span>
           </h1>
           
           <p className="text-on-surface-variant font-body text-sm md:text-base leading-relaxed mb-12 max-w-[280px] mx-auto">
-            A boutique nocturnal culinary experience. Curated personally for your plate.
+            {t('tagline')}
           </p>
 
           <div className="flex flex-col gap-4 pointer-events-auto">
@@ -50,12 +56,12 @@ export default function Home() {
               className="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold py-5 rounded-2xl flex items-center justify-center gap-3 shadow-2xl group transition-all"
             >
               <Play className="w-5 h-5 fill-current" />
-              <span>Begin Interactive Experience</span>
+              <span>{t('begin_experience')}</span>
               <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </motion.button>
             
             <button className="w-full bg-transparent border border-outline-variant/30 text-on-surface font-medium py-5 rounded-2xl flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
-              Browse Classic Menu
+              {t('browse_classic')}
             </button>
           </div>
         </motion.div>

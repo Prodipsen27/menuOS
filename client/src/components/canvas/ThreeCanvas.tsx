@@ -11,6 +11,7 @@ interface ThreeCanvasProps {
   shadows?: boolean;
   camera?: any;
   controls?: boolean;
+  stage?: boolean;
 }
 
 export const ThreeCanvas = ({
@@ -19,6 +20,7 @@ export const ThreeCanvas = ({
   shadows = true,
   camera = { position: [0, 0, 5], fov: 45 },
   controls = false,
+  stage = true,
 }: ThreeCanvasProps) => {
   return (
     <div className={cn("w-full h-full", className)}>
@@ -29,14 +31,16 @@ export const ThreeCanvas = ({
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <Stage
-            intensity={0.5}
-            environment="city"
-            shadows={shadows}
-            adjustCamera={false}
-          >
-            {children}
-          </Stage>
+          {stage ? (
+            <Stage
+              intensity={0.5}
+              environment="city"
+              shadows={shadows}
+              adjustCamera={false}
+            >
+              {children}
+            </Stage>
+          ) : children}
           {controls && <OrbitControls makeDefault />}
         </Suspense>
         <Preload all />

@@ -8,6 +8,8 @@ export const getMenuItems = async (req, res) => {
 export const createMenuItem = async (req, res) => {
   const newItem = new Menu(req.body);
   await newItem.save();
+  const io = req.app.get("io");
+  io.emit("menu:update");
   res.status(201).json(newItem);
 };
 
@@ -17,11 +19,15 @@ export const updateMenuItem = async (req, res) => {
     req.body, 
     { new: true }
   );
+  const io = req.app.get("io");
+  io.emit("menu:update");
   res.json(updatedItem);
 };
 
 export const deleteMenuItem = async (req, res) => {
   await Menu.findByIdAndDelete(req.params.id);
+  const io = req.app.get("io");
+  io.emit("menu:update");
   res.json({ message: "Item deleted" });
 };
 
@@ -31,5 +37,17 @@ export const toggleAvailability = async (req, res) => {
   
   item.isAvailable = !item.isAvailable;
   await item.save();
+  const io = req.app.get("io");
+  io.emit("menu:update");
   res.json(item);
+};
+
+export const getMenuItem = async (req, res) => {
+  try {
+    const item = await Menu.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Item not found" });
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ message: "Invalid ID format or error fetching item" });
+  }
 };

@@ -5,6 +5,8 @@ import { Plus } from "lucide-react";
 import { useCartStore } from "@/features/cart/cartStore";
 import { cn, formatPrice } from "@/lib/utils";
 
+import { useTranslation } from "@/hooks/useTranslation";
+
 interface MenuItem {
   id: string;
   name: string;
@@ -16,12 +18,13 @@ interface MenuItem {
 }
 
 export default function FeaturedCard({ item }: { item: MenuItem }) {
+  const { t } = useTranslation();
   const { addToCart } = useCartStore();
 
   return (
     <section className="mb-12">
       <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant mb-4">
-        Chef's Signature
+        {t('chef_signature')}
       </h3>
       <motion.div 
         whileHover={{ y: -8 }}
@@ -41,7 +44,7 @@ export default function FeaturedCard({ item }: { item: MenuItem }) {
           {/* Badge */}
           <div className="absolute top-6 left-6">
             <div className="bg-primary/90 backdrop-blur-md text-on-primary text-[10px] font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-2xl">
-              Must Try
+              {t('must_try')}
             </div>
           </div>
 

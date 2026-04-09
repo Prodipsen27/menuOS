@@ -7,50 +7,74 @@ import {
   ClipboardList, 
   LayoutDashboard, 
   Settings, 
-  Bell
+  QrCode
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { API_URL } from "@/lib/apiConfig";
+import { io } from "socket.io-client";
+import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
 import { useEffect, useState } from "react";
 
+const socket = io(API_BASE_URL);
 
 const NAV_ITEMS = [
   { name: "Overview", icon: LayoutDashboard, href: "/admin" },
   { name: "Orders", icon: ClipboardList, href: "/admin/orders" },
   { name: "Menu", icon: ChefHat, href: "/admin/menu" },
   { name: "Analytics", icon: BarChart3, href: "/admin/analytics" },
-  { name: "Notifications", icon: Bell, href: "/admin/notifications" },
+  { name: "QR Tables", icon: QrCode, href: "/admin/qr" },
   { name: "Settings", icon: Settings, href: "/admin/settings" },
 ];
 
 export default function AdminSidebar() {
   const pathname = usePathname();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [newOrdersCount, setNewOrdersCount] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
     if (!token) return;
 
-    const fetchUnread = async () => {
+    const fetchNewOrders = async () => {
       try {
-        const res = await fetch(`${API_URL}/admin/notifications`, {
+        const res = await fetch(`${API_URL}/admin/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {
           const data = await res.json();
-          setUnreadCount(data.filter((n: { isRead: boolean }) => !n.isRead).length);
+          // Count only "received" orders as new
+          setNewOrdersCount(data.filter((o: { status: string }) => o.status === "received").length);
         }
       } catch (err) {
         // Silently fail for sidebar badge
       }
     };
 
-    fetchUnread();
-    // Poll every 30s for new notifications
-    const interval = setInterval(fetchUnread, 30000);
-    return () => clearInterval(interval);
+    fetchNewOrders();
+
+    // 🚀 Real-time logic
+    socket.on("orders:new", (newOrder) => {
+      if (newOrder.status === "received") {
+        setNewOrdersCount(prev => prev + 1);
+      }
+    });
+
+    socket.on("orders:status_update", (updatedOrder) => {
+      // Re-fetch or manually adjust count
+      // Manual adjustment is cleaner for performance
+      // If an order moves OUT of "received", decrement
+      // If an order moves INTO "received" (unlikely but possible), increment
+      // Since status_update happens for ANY update, we need a way to know if it was previously received.
+      // Easiest is to re-fetch or keep the ID list.
+      // Let's re-fetch for simplicity and accuracy, but maybe throttle?
+      // Actually, let's just re-fetch the count logic.
+      fetchNewOrders();
+    });
+
+    return () => {
+      socket.off("orders:new");
+      socket.off("orders:status_update");
+    };
   }, []);
 
   return (
@@ -66,7 +90,7 @@ export default function AdminSidebar() {
       <nav className="flex-1 px-4 space-y-1">
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href;
-          const isNotifications = item.href === "/admin/notifications";
+          const isOrders = item.href === "/admin/orders";
 
           return (
             <Link
@@ -91,14 +115,14 @@ export default function AdminSidebar() {
                 <span className="text-sm font-medium tracking-wide">{item.name}</span>
               </div>
 
-              {/* Unread badge */}
-              {isNotifications && unreadCount > 0 && (
+              {/* New Orders badge */}
+              {isOrders && newOrdersCount > 0 && (
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-on-primary text-[9px] font-bold shadow-lg shadow-primary/30"
                 >
-                  {unreadCount > 9 ? "9+" : unreadCount}
+                  {newOrdersCount > 9 ? "9+" : newOrdersCount}
                 </motion.span>
               )}
             </Link>

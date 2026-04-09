@@ -7,12 +7,16 @@ import FeaturedCarousel from "@/components/menu/FeaturedCarousel";
 import ViewToggle from "@/components/menu/ViewToggle";
 import CartPanel from "@/components/cart/CartPanel";
 import { ThreeCanvas } from "@/components/canvas/ThreeCanvas";
-import { HeroModel } from "@/components/canvas/HeroModel";
-import { Sparkles, Loader2, Utensils } from "lucide-react";
+import { DynamicScene } from "@/components/canvas/DynamicScene";
+import { Sparkles, Loader2, Utensils, Coffee, Beer, IceCream } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/features/settings/settingsStore";
-import { API_URL } from "@/lib/apiConfig";
-
+import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useLiveMenu } from "@/hooks/useLiveMenu";
+import { useCallback } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCartStore } from "@/features/cart/cartStore";
 
 interface MenuItem {
   id: string;
@@ -26,17 +30,24 @@ interface MenuItem {
 }
 
 export default function MenuPage() {
+  const searchParams = useSearchParams();
+  const setTableNumber = useCartStore(state => state.setTableNumber);
+  
+  const { t } = useTranslation();
   const { restaurantName, cuisineStyle } = useSettingsStore();
   const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    const table = searchParams.get("table");
+    if (table) {
+      setTableNumber(table);
+    }
+  }, [searchParams, setTableNumber]);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchMenuItems();
-  }, []);
-
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(`${API_URL}/menu`);
@@ -49,7 +60,13 @@ export default function MenuPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchMenuItems();
+  }, [fetchMenuItems]);
+
+  useLiveMenu(fetchMenuItems);
 
   const categories = ["All", ...new Set(items.map((item) => item.category))];
   
@@ -66,53 +83,89 @@ export default function MenuPage() {
     })
     .sort((a, b) => Number(b.isAvailable) - Number(a.isAvailable));
   return (
-    <div className="relative min-h-screen bg-background overflow-x-hidden">
-      {/* 3D Background Atmosphere */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-30">
-        <ThreeCanvas>
-          <HeroModel />
-        </ThreeCanvas>
-      </div>
+    <div className="relative min-h-screen bg-neutral-950 overflow-x-hidden">
+      <main className="relative z-10 max-w-[450px] mx-auto pb-40 px-6">
+        {/* Landscape Hero Section with 3D Background */}
+        <section className="relative -mx-6 mb-12 h-[35vh] min-h-[280px] overflow-hidden rounded-b-[4rem] shadow-2xl bg-neutral-900">
+          <div className="absolute inset-0 z-0">
+            <ThreeCanvas stage={false} camera={{ position: [0, 0, 8], fov: 40 }}>
+              <DynamicScene />
+            </ThreeCanvas>
+            {/* Reduced vignette for better 3D visibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-transparent to-neutral-950/20 opacity-40" />
+          </div>
 
-      <main className="relative z-10 max-w-[450px] mx-auto pt-24 pb-40 px-6">
-        {/* Header Section */}
-        <header className="mb-12">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-4"
-          >
-            <div className="bg-primary/20 p-2 rounded-xl">
-              <Sparkles className="text-primary" size={20} />
-            </div>
-            <span className="text-on-surface-variant text-[10px] uppercase tracking-[0.3em] font-bold">
-              {cuisineStyle} Experience
-            </span>
-          </motion.div>
-          
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl font-headline italic font-bold text-on-surface leading-tight tracking-tight mb-2"
-          >
-            The {restaurantName.split(' ')[0]} Menu
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-on-surface-variant font-body text-sm max-w-[280px]"
-          >
-            Hand-crafted culinary experiences designed for the gourmet soul.
-          </motion.p>
-        </header>
+          <header className="relative z-10 h-full flex flex-col items-center justify-center text-center px-8 pt-8">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+              className="flex flex-col items-center"
+            >
+              {/* Ultra small, high-tracking top label */}
+              <motion.span
+                initial={{ letterSpacing: "0.2em", opacity: 0 }}
+                animate={{ letterSpacing: "0.6em", opacity: 0.6 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="text-[7px] font-black uppercase text-on-surface-variant mb-6"
+              >
+                {cuisineStyle} {t('experience_suffix')}
+              </motion.span>
+
+              {/* Minimalist Restaurant Icon/Name */}
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="mb-3"
+              >
+                <h2 className="text-2xl font-headline italic font-light text-on-surface tracking-[0.2em]">
+                  {restaurantName.split(' ')[0]}
+                </h2>
+              </motion.div>
+
+              {/* The "Menu" text - Small, premium, animated */}
+              <div className="flex items-center gap-3 mb-6">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: 24 }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="h-[1px] bg-primary/40" 
+                />
+                <motion.h1 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="text-[10px] font-black uppercase tracking-[0.8em] text-primary drop-shadow-glow"
+                >
+                  {t('menu')}
+                </motion.h1>
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: 24 }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="h-[1px] bg-primary/40" 
+                />
+              </div>
+              
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                transition={{ delay: 1, duration: 1 }}
+                className="text-[8px] uppercase tracking-[0.4em] font-medium text-on-surface leading-loose max-w-[180px]"
+              >
+                {t('hand_crafted')}
+              </motion.p>
+            </motion.div>
+          </header>
+        </section>
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
-             <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                <Loader2 className="animate-spin text-primary" size={24} />
-             </div>
-             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40">Awakening the Catalog...</p>
+            <div className="w-16 h-16 rounded-3xl bg-primary/10 flex items-center justify-center border border-primary/20">
+              <Loader2 className="animate-spin text-primary" size={24} />
+            </div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/40">{t('awakening')}</p>
           </div>
         ) : (
           <>
@@ -125,30 +178,30 @@ export default function MenuPage() {
                 <div className="w-16 h-16 bg-surface-container rounded-[2rem] flex items-center justify-center mx-auto text-on-surface-variant/20">
                   <Utensils size={32} />
                 </div>
-                <p className="text-sm font-medium text-on-surface-variant">The kitchen is currently in preparation.</p>
+                <p className="text-sm font-medium text-on-surface-variant">{t('kitchen_prep')}</p>
               </div>
             )}
 
             {items.length > 0 && (
               <>
-                {/* Categories Navigation & View Controls */}
-                <div className="sticky top-[72px] z-30 mb-8 bg-background/80 backdrop-blur-md -mx-6 px-6 py-4 flex items-center justify-between gap-4">
-                  <nav className="flex overflow-x-auto no-scrollbar gap-3 flex-grow">
+                {/* Categories Navigation & View Controls (Solid Background) */}
+                <div className="sticky top-[72px] z-30 mb-8 bg-neutral-950 border-b border-white/5 -mx-6 px-6 py-4 flex items-center justify-between gap-4 shadow-2xl">
+                  <nav className="flex overflow-x-auto no-scrollbar gap-2 flex-grow scroll-smooth">
                     {categories.map((cat, idx) => (
                       <motion.button
                         key={cat}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05 }}
                         onClick={() => setSelectedCategory(cat)}
                         className={cn(
-                          "px-6 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all border",
+                          "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border flex-shrink-0",
                           selectedCategory === cat
-                            ? "bg-primary text-on-primary border-primary shadow-lg shadow-primary/25"
-                            : "bg-surface-container-low text-on-surface-variant border-outline-variant/20 hover:bg-surface-container-high"
+                            ? "bg-primary text-on-primary border-primary shadow-glow shadow-primary/20"
+                            : "bg-surface-container/60 text-on-surface-variant/60 border-white/5 hover:bg-white/10 hover:text-on-surface"
                         )}
                       >
-                        {cat}
+                        {cat === "All" ? t('all') : cat}
                       </motion.button>
                     ))}
                   </nav>
@@ -178,17 +231,23 @@ export default function MenuPage() {
 
         {/* AI Prompting Placeholder */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-16 p-6 rounded-[2.5rem] bg-surface-container-high/40 backdrop-blur-md border border-primary/10 text-center"
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-20 p-8 rounded-[3rem] bg-neutral-900 border border-primary/20 text-center relative overflow-hidden group shadow-2xl"
         >
-          <p className="text-on-surface-variant text-xs italic font-body mb-4">
-            "I'm looking for something bold and aromatic..."
-          </p>
-          <button className="bg-primary/10 text-primary border border-primary/20 px-6 py-3 rounded-2xl text-xs font-bold tracking-wider hover:bg-primary/20 transition-all">
-            ASK YOUR DIGITAL SOMMELIER
-          </button>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-50 group-hover:opacity-80 transition-opacity" />
+          <div className="relative z-10">
+            <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
+              <Sparkles className="text-primary" size={24} />
+            </div>
+            <p className="text-on-surface-variant text-sm font-headline italic mb-6 leading-relaxed">
+              "{t('bold_aromatic')}"
+            </p>
+            <button className="bg-primary text-on-primary px-8 py-4 rounded-2xl text-[10px] font-black tracking-[0.2em] hover:scale-105 active:scale-95 transition-all font-body uppercase shadow-lg shadow-primary/20">
+              {t('ask_sommelier')}
+            </button>
+          </div>
         </motion.div>
       </main>
 

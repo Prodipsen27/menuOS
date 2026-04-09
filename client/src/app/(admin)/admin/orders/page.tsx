@@ -8,26 +8,30 @@ import {
   ChefHat, 
   Utensils,
   History as HistoryIcon,
-  Archive
+  Archive,
+  XCircle
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
+import { useDialogStore } from "@/features/ui/dialogStore";
 
-type OrderStatus = "received" | "preparing" | "serving" | "archived";
+type OrderStatus = "received" | "preparing" | "serving" | "archived" | "canceled";
 
 interface OrderItem {
   id: string;
   name: string;
   quantity: number;
+  price: number;
 }
 
 interface Order {
   id: string;
   table: string;
   items: OrderItem[];
+  total: number;
   status: OrderStatus;
   createdAt: string;
   elapsed?: number;
@@ -40,6 +44,7 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<"active" | "history">("active");
   const router = useRouter();
+  const showDialog = useDialogStore((state) => state.show);
 
   useEffect(() => {
     const token = localStorage.getItem("admin_token");
@@ -116,8 +121,8 @@ export default function OrdersPage() {
     setOrders(prev => prev.filter(o => o.id !== id));
   };
 
-  const activeOrders = orders.filter(o => o.status !== "archived");
-  const historyOrders = orders.filter(o => o.status === "archived");
+  const activeOrders = orders.filter(o => o.status !== "archived" && o.status !== "canceled");
+  const historyOrders = orders.filter(o => o.status === "archived" || o.status === "canceled");
   
   const displayOrders = activeTab === "active" ? activeOrders : historyOrders;
 
@@ -126,6 +131,7 @@ export default function OrdersPage() {
       case "received": return "text-primary border-primary/20 bg-primary/5";
       case "preparing": return "text-secondary border-secondary/20 bg-secondary/5";
       case "serving": return "text-emerald-400 border-emerald-400/20 bg-emerald-400/5";
+      case "canceled": return "text-rose-400 border-rose-400/20 bg-rose-400/5";
       case "archived": return "text-on-surface-variant/40 border-white/5 bg-white/5";
       default: return "text-on-surface-variant/40 border-white/5 bg-white/5";
     }
@@ -197,6 +203,7 @@ export default function OrdersPage() {
                   {order.status === "preparing" && <ChefHat size={12} />}
                   {order.status === "serving" && <CheckCircle2 size={12} />}
                   {order.status === "archived" && <HistoryIcon size={12} />}
+                  {order.status === "canceled" && <XCircle size={12} />}
                   {order.status}
                 </div>
               </div>
@@ -207,10 +214,19 @@ export default function OrdersPage() {
                   <div key={idx} className="flex items-start justify-between">
                     <div className="flex gap-3">
                       <span className="text-primary font-bold tabular-nums">{item.quantity}×</span>
-                      <span className="text-sm font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">{item.name}</span>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium text-on-surface-variant group-hover:text-on-surface transition-colors">{item.name}</span>
+                        <span className="text-[10px] text-on-surface-variant/40 font-bold uppercase tracking-widest italic">{item.price ? `₹${item.price.toFixed(2)}` : ""}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Total Display */}
+              <div className="px-6 py-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-[0.25em] text-on-surface-variant/40">Total Amount</span>
+                <span className="text-lg font-black text-primary">₹{order.total?.toFixed(2) || "0.00"}</span>
               </div>
 
               {/* Card Footer / Actions */}
@@ -247,21 +263,28 @@ export default function OrdersPage() {
                   )}
                   
                   <button 
-                    onClick={async () => {
-                      const token = localStorage.getItem("admin_token");
-                      if (!token) return;
-                      if (!confirm("Permanently delete this order from records?")) return;
-                      try {
-                        const res = await fetch(`${API_URL}/admin/orders/${order.id}`, {
-                          method: "DELETE",
-                          headers: { "Authorization": `Bearer ${token}` }
-                        });
-                        if (res.ok) {
-                          setOrders(prev => prev.filter(o => o.id !== order.id));
+                    onClick={() => {
+                      showDialog({
+                        title: "Delete Order",
+                        message: "Permanently delete this order from records? This action cannot be undone.",
+                        type: "warning",
+                        confirmLabel: "Delete Permanently",
+                        onConfirm: async () => {
+                          const token = localStorage.getItem("admin_token");
+                          if (!token) return;
+                          try {
+                            const res = await fetch(`${API_URL}/admin/orders/${order.id}`, {
+                              method: "DELETE",
+                              headers: { "Authorization": `Bearer ${token}` }
+                            });
+                            if (res.ok) {
+                              setOrders(prev => prev.filter(o => o.id !== order.id));
+                            }
+                          } catch (err) {
+                            console.error("Delete failed", err);
+                          }
                         }
-                      } catch (err) {
-                        console.error("Delete failed", err);
-                      }
+                      });
                     }}
                     className="p-2.5 rounded-xl bg-surface-container-high border border-white/5 text-on-surface-variant/40 hover:text-rose-500 transition-all"
                   >

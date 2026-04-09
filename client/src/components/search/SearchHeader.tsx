@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Search as SearchIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface SearchHeaderProps {
   query: string;
@@ -10,6 +11,7 @@ interface SearchHeaderProps {
 }
 
 export default function SearchHeader({ query, setQuery }: SearchHeaderProps) {
+  const { t } = useTranslation();
   return (
     <div className="sticky top-[72px] z-30 -mx-6 px-6 py-6 pb-2 transition-all">
       <div className="relative group">
@@ -30,10 +32,10 @@ export default function SearchHeader({ query, setQuery }: SearchHeaderProps) {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search the menu..."
+            placeholder={t('search_placeholder')}
             className="w-full bg-transparent text-on-surface placeholder:text-on-surface-variant/30 focus:outline-none text-base font-body tracking-tight"
             autoFocus
-            aria-label="Search menu items"
+            aria-label={t('search')}
           />
 
           {query && (
@@ -43,7 +45,7 @@ export default function SearchHeader({ query, setQuery }: SearchHeaderProps) {
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={() => setQuery("")}
               className="p-1.5 bg-surface-container-highest rounded-full text-on-surface-variant hover:text-on-surface transition-colors"
-              aria-label="Clear search"
+              aria-label={t('clear')}
             >
               <X size={16} />
             </motion.button>

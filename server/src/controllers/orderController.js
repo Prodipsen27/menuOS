@@ -1,31 +1,19 @@
-import { createOrderService, getAllOrdersService, getOrderService, updateOrderStatusService } from "../services/orderService.js";
+import { createOrderService, getAllOrdersService, getOrderService, updateOrderStatusService, cancelOrderService } from "../services/orderService.js";
 import { io } from "../index.js";
-import { Notification } from "../models/notificationModel.js";
 
 export const createOrder = async (req, res) => {
-  const { name, items, total, table } = req.body;
+  const { name, items, total, table, phone, email } = req.body;
 
   if (!name || !items || items.length === 0 || !total) {
     return res.status(400).json({ message: "Invalid order data" });
   }
 
-  const order = await createOrderService({ name, items, total, table });
+  const order = await createOrderService({ name, items, total, table, phone, email });
 
-  // 🔥 Create Notification
-  await Notification.create({
-    title: "New Order Arrived",
-    message: `Table ${table} just placed an order for ${items.length} items.`,
-    type: "order",
-    metadata: {
-      orderId: order._id,
-      table: table
-    }
-  });
 
   // 🔥 Notify Admins (Global)
   const orderJSON = order.toJSON();
   io.emit("orders:new", orderJSON);
-  io.emit("notifications:new", { message: "Refresh notifications" }); // Hint to refresh
 
   res.status(201).json(orderJSON);
 };
@@ -65,4 +53,25 @@ export const updateOrderStatus = async (req, res) => {
   io.emit("orders:status_update", orderJSON);
 
   res.json(orderJSON);
+};
+
+export const cancelOrder = async (req, res) => {
+  try {
+    const order = await cancelOrderService(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const orderJSON = order.toJSON();
+    // Notify Guest
+    io.to(order._id ? order._id.toString() : order.id).emit("orders:status_update", orderJSON);
+    // Notify Admins
+    io.emit("orders:status_update", orderJSON);
+    io.emit("notifications:new", { message: `Order was canceled by guest.` });
+
+    res.json(orderJSON);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 };

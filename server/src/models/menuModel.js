@@ -7,7 +7,7 @@ const menuSchema = new mongoose.Schema({
   category: { 
     type: String, 
     required: true,
-    enum: ["cocktails", "mains", "desserts", "starters"]
+    enum: ["cocktails", "mains", "desserts", "starters", "drinks"]
   },
   image: { type: String },
   isAvailable: { type: Boolean, default: true },

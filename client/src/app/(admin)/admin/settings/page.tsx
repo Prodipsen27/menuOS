@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { API_URL } from "@/lib/apiConfig";
 import { useEffect, useState } from "react";
+import { useDialogStore } from "@/features/ui/dialogStore";
 
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
@@ -35,6 +36,7 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState<SettingsState | null>(null);
   const router = useRouter();
+  const showDialog = useDialogStore((state) => state.show);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -77,11 +79,15 @@ export default function SettingsPage() {
         },
         body: JSON.stringify(settings)
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setSettings(updated);
-        alert("Aura configuration synchronized successfully.");
-      }
+        if (res.ok) {
+          const updated = await res.json();
+          setSettings(updated);
+          showDialog({
+            title: "Configuration Saved",
+            message: "Aura configuration synchronized successfully across the ecosystem.",
+            type: "success"
+          });
+        }
     } catch (err) {
       console.error("Update failed", err);
     } finally {
