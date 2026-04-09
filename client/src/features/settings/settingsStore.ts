@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { API_URL } from "@/lib/apiConfig";
 
 interface SettingsState {
   restaurantName: string;
@@ -19,7 +20,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   isLoaded: false,
   fetchSettings: async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/admin/settings");
+      const res = await fetch(`${API_URL}/admin/settings`);
+
       // Actually, public menu shouldn't need admin token for basic settings
       // Let's create a public settings route or just allow getSettings to be public
       if (res.ok) {
