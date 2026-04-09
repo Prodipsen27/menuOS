@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/apiConfig";
+
 
 interface Notification {
   _id: string;
@@ -54,7 +56,7 @@ export default function NotificationsPage() {
     if (!token) { router.push("/login"); return; }
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/notifications", {
+      const res = await fetch(`${API_URL}/admin/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) setNotifications(await res.json());
@@ -73,7 +75,7 @@ export default function NotificationsPage() {
   const markAsRead = async (id: string) => {
     const token = localStorage.getItem("admin_token");
     try {
-      await fetch(`http://localhost:5000/api/admin/notifications/${id}/read`, {
+      await fetch(`${API_URL}/admin/notifications/${id}/read`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${token}` },
       });

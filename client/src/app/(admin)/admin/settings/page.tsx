@@ -15,7 +15,9 @@ import {
   Mail,
   UserCircle2
 } from "lucide-react";
+import { API_URL } from "@/lib/apiConfig";
 import { useEffect, useState } from "react";
+
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
@@ -43,7 +45,7 @@ export default function SettingsPage() {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/admin/settings", {
+        const res = await fetch(`${API_URL}/admin/settings`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {
@@ -67,7 +69,7 @@ export default function SettingsPage() {
     
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch("http://localhost:5000/api/admin/settings", {
+      const res = await fetch(`${API_URL}/admin/settings`, {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",

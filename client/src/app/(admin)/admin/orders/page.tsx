@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { io } from "socket.io-client";
 import { useRouter } from "next/navigation";
+import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
 
 type OrderStatus = "received" | "preparing" | "serving" | "archived";
 
@@ -32,7 +33,8 @@ interface Order {
   elapsed?: number;
 }
 
-const socket = io("http://localhost:5000");
+const socket = io(API_BASE_URL);
+
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -47,7 +49,7 @@ export default function OrdersPage() {
     }
 
     // 1. Initial Fetch
-    fetch("http://localhost:5000/api/admin/orders", {
+    fetch(`${API_URL}/admin/orders`, {
       headers: {
         "Authorization": `Bearer ${token}`
       }
@@ -90,7 +92,7 @@ export default function OrdersPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/admin/orders/${id}/status`, {
+      const response = await fetch(`${API_URL}/admin/orders/${id}/status`, {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",
@@ -250,7 +252,7 @@ export default function OrdersPage() {
                       if (!token) return;
                       if (!confirm("Permanently delete this order from records?")) return;
                       try {
-                        const res = await fetch(`http://localhost:5000/api/admin/orders/${order.id}`, {
+                        const res = await fetch(`${API_URL}/admin/orders/${order.id}`, {
                           method: "DELETE",
                           headers: { "Authorization": `Bearer ${token}` }
                         });

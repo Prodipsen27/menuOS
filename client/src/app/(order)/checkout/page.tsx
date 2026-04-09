@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { ChevronLeft, CreditCard, MapPin, Phone, User, CheckCircle2, Save } from "lucide-react";
 import Link from "next/link";
 import { cn, formatPrice } from "@/lib/utils";
+import { API_URL } from "@/lib/apiConfig";
+
 
 const CUSTOMER_KEY = "guest_profile";
 
@@ -65,7 +67,7 @@ export default function CheckoutPage() {
     saveProfile(form); // Persist before placing order
 
     try {
-      const response = await fetch("http://localhost:5000/api/orders", {
+      const response = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

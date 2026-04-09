@@ -15,6 +15,8 @@ import { cn, formatPrice } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSettingsStore } from "@/features/settings/settingsStore";
+import { API_URL } from "@/lib/apiConfig";
+
 
 interface DashboardStats {
   totalRevenue: number;
@@ -38,7 +40,7 @@ export default function AdminPage() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/admin/stats", {
+      const res = await fetch(`${API_URL}/admin/stats`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
       if (res.ok) {

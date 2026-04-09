@@ -19,6 +19,8 @@ import {
 import { useEffect, useState } from "react";
 import { cn, formatPrice, CURRENCY_SYMBOL } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { API_URL } from "@/lib/apiConfig";
+
 
 type Category = "cocktails" | "mains" | "desserts" | "starters";
 
@@ -67,7 +69,7 @@ export default function AdminMenuPage() {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/menu");
+      const res = await fetch(`${API_URL}/menu`);
       const data = await res.json();
       setItems(data);
     } catch (err) {
@@ -103,8 +105,8 @@ export default function AdminMenuPage() {
     setIsSubmitting(true);
     const token = localStorage.getItem("admin_token");
     const url = editingItem 
-      ? `http://localhost:5000/api/menu/${editingItem.id}` 
-      : "http://localhost:5000/api/menu";
+      ? `${API_URL}/menu/${editingItem.id}` 
+      : `${API_URL}/menu`;
     const method = editingItem ? "PATCH" : "POST";
 
     try {
@@ -140,7 +142,7 @@ export default function AdminMenuPage() {
     e.stopPropagation();
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch(`http://localhost:5000/api/menu/${id}/toggle`, {
+      const res = await fetch(`${API_URL}/menu/${id}/toggle`, {
         method: "PATCH",
         headers: { "Authorization": `Bearer ${token}` }
       });
@@ -157,7 +159,7 @@ export default function AdminMenuPage() {
     e.stopPropagation();
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch(`http://localhost:5000/api/menu/${item.id}`, {
+      const res = await fetch(`${API_URL}/menu/${item.id}`, {
         method: "PATCH",
         headers: { 
           "Content-Type": "application/json",
@@ -179,7 +181,7 @@ export default function AdminMenuPage() {
     if (!confirm("Remove this item from the catalog?")) return;
     const token = localStorage.getItem("admin_token");
     try {
-      const res = await fetch(`http://localhost:5000/api/menu/${id}`, {
+      const res = await fetch(`${API_URL}/menu/${id}`, {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });

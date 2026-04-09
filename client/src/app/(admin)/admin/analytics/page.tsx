@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice, cn } from "@/lib/utils";
 import { useSettingsStore } from "@/features/settings/settingsStore";
+import { API_URL } from "@/lib/apiConfig";
+
 
 interface AnalyticsData {
   dailyRevenue: { label: string; value: number }[];
@@ -40,7 +42,7 @@ export default function AnalyticsPage() {
       }
 
       try {
-        const res = await fetch("http://localhost:5000/api/admin/analytics", {
+        const res = await fetch(`${API_URL}/admin/analytics`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         if (res.ok) {

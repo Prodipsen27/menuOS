@@ -11,6 +11,8 @@ import { HeroModel } from "@/components/canvas/HeroModel";
 import { Sparkles, Loader2, Utensils } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/features/settings/settingsStore";
+import { API_URL } from "@/lib/apiConfig";
+
 
 interface MenuItem {
   id: string;
@@ -37,7 +39,7 @@ export default function MenuPage() {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/menu");
+      const res = await fetch(`${API_URL}/menu`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setItems(data);

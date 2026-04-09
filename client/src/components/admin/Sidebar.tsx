@@ -12,7 +12,9 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { API_URL } from "@/lib/apiConfig";
 import { useEffect, useState } from "react";
+
 
 const NAV_ITEMS = [
   { name: "Overview", icon: LayoutDashboard, href: "/admin" },
@@ -33,7 +35,7 @@ export default function AdminSidebar() {
 
     const fetchUnread = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/admin/notifications", {
+        const res = await fetch(`${API_URL}/admin/notifications`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) {

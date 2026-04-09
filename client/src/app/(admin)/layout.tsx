@@ -5,8 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, Bell, LogOut } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { API_URL } from "@/lib/apiConfig";
 
 export default function AdminLayout({
+
   children,
 }: {
   children: React.ReactNode;
@@ -27,7 +29,7 @@ export default function AdminLayout({
     const token = localStorage.getItem("admin_token");
     if (!token || isLoginPage) return;
     try {
-      const res = await fetch("http://localhost:5000/api/admin/notifications", {
+      const res = await fetch(`${API_URL}/admin/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {

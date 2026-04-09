@@ -11,7 +11,7 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>((set) => ({
-  restaurantName: "Aura Gastronomy",
+  restaurantName: "Zx Cafe",
   cuisineStyle: "Contemporary Fusion",
   currencySymbol: "₹",
   timezone: "IST (Asia/Kolkata)",

@@ -12,8 +12,10 @@ import { io } from "socket.io-client";
 import { useSearchParams, useRouter } from "next/navigation";
 import { generateOrderReceipt } from "@/lib/generateReceipt";
 import { useSettingsStore } from "@/features/settings/settingsStore";
+import { API_URL, API_BASE_URL } from "@/lib/apiConfig";
 
-const socket = io("http://localhost:5000");
+const socket = io(API_BASE_URL);
+
 
 const STEPS = [
   { id: "received", label: "Confirmed", icon: CheckCircle2 },
@@ -86,7 +88,7 @@ function TrackingContent() {
   useEffect(() => {
     if (!orderId) return;
 
-    fetch(`http://localhost:5000/api/orders/${orderId}`)
+    fetch(`${API_URL}/orders/${orderId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.id) {

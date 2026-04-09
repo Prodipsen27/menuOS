@@ -4,14 +4,14 @@ import http from "http";
 import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
+// Connect to DB (Vercel will call this on each cold start)
 connectDB();
-
 
 const server = http.createServer(app);
 
-// 🔥 SOCKET SERVER
+// 🔥 SOCKET SERVER (Note: This will not work effectively on Vercel)
 export const io = new Server(server, {
   cors: {
     origin: "*",
@@ -20,14 +20,17 @@ export const io = new Server(server, {
 
 io.on("connection", (socket) => {
   console.log("Client connected:", socket.id);
-
-  // 🔥 JOIN ROOM (order-specific)
   socket.on("join_order", (orderId) => {
     socket.join(orderId);
-    console.log(`Socket ${socket.id} joined order ${orderId}`);
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Conditionally listen (Only if NOT running on Vercel)
+if (process.env.NODE_ENV !== "production") {
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export the server for Vercel
+export default server;
