@@ -6,12 +6,10 @@ import { connectDB } from "./config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to DB (Vercel will call this on each cold start)
 connectDB();
 
 const server = http.createServer(app);
 
-// 🔥 SOCKET SERVER (Note: This will not work effectively on Vercel)
 export const io = new Server(server, {
   cors: {
     origin: "*",
@@ -25,23 +23,26 @@ io.on("connection", (socket) => {
   });
 });
 
-// Conditionally listen (Only if NOT running on Vercel)
-if (process.env.NODE_ENV !== "production") {
+// FIX: Always listen if on Render, or use a specific Vercel check
+if (!process.env.VERCEL) { 
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
 }
 
+// Keep-alive route
 app.get("/keep-alive", (req, res) => {
   res.send("Keep Alive");
 });
 
+// Self-ping every 14 minutes
 setInterval(() => {
-  fetch(process.env.BACK_URL)
-  .then(() => console.log("Keep Alive"))
-  .catch((err) => console.log(err));
+  const url = process.env.BACK_URL;
+  if (url) {
+    fetch(url)
+      .then(() => console.log("Self-ping successful: Keep Alive"))
+      .catch((err) => console.log("Self-ping failed:", err.message));
+  }
 }, 1000 * 60 * 14);
 
-
-// Export the server for Vercel
 export default server;
