@@ -5,5 +5,6 @@ export interface MenuItem {
   price: number;
   image: string;
   category: "Starters" | "Mains" | "Drinks" | "Desserts";
+  isAvailable: boolean;
   isFeatured?: boolean;
 }
